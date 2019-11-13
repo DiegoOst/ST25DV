@@ -239,6 +239,7 @@ uint8_t aSt25Dv[ST25DV_MAX_INSTANCE] = {0};
 /* Public functions ---------------------------------------------------------*/
 /**
   * @brief  ST25DV nfctag Initialization.
+  * @param mi2cChannel : I2C channel
   * @return NFCTAG_StatusTypeDef enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_Init( I2C* mi2cChannel, DigitalOut * mLPD )
@@ -250,6 +251,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_Init( I2C* mi2cChannel, DigitalOut * mLPD )
 /**
   * @brief  Reads the ST25DV ID.
   * @param  pICRef Pointeron a uint8_t used to return the ST25DV ID.
+  * @param mi2cChannel : I2C channel
   * @return NFCTAG_StatusTypeDef enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_ReadID( uint8_t * const pICRef, I2C * mi2cChannel )
@@ -261,6 +263,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_ReadID( uint8_t * const pICRef, I2C * mi2cChanne
 /**
   * @brief  Reads the ST25DV IC Revision.
   * @param  pICRev Pointer on the uint8_t used to return the ST25DV IC Revision number.
+  * @param mi2cChannel : I2C channel
   * @return NFCTAG_StatusTypeDef enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_ReadICRev( uint8_t * const pICRev, I2C * mi2cChannel )
@@ -274,6 +277,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_ReadICRev( uint8_t * const pICRev, I2C * mi2cCha
   * @details  The ST25DV I2C is NACKed when a RF communication is on-going.
   *           This function determines if the ST25DV is ready to answer an I2C request. 
   * @param    Trials Max number of tentative.
+  * @param mi2cChannel : I2C channel
   * @retval   NFCTAG_StatusTypeDef enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_IsDeviceReady( const uint32_t Trials, I2C * mi2cChannel)
@@ -293,7 +297,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_IsDeviceReady( const uint32_t Trials, I2C * mi2c
   *                     - RFPUTMSG = 0x20
   *                     - RFGETMSG = 0x40
   *                     - RFWRITE = 0x80
-  *
+  * @param mi2cChannel : I2C channel
   * @retval   NFCTAG_StatusTypeDef enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_GetGPOStatus( uint16_t * const pGPOStatus, I2C * mi2cChannel )
@@ -325,6 +329,8 @@ NFCTAG_StatusTypeDef ST25DV_i2c_GetGPOStatus( uint16_t * const pGPOStatus, I2C *
   *           - RFGETMSG = 0x40
   *           - RFWRITE = 0x80
   *
+  * @param mi2cChannel : I2C channel
+  *
   * @retval   NFCTAG_StatusTypeDef enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_ConfigureGPO( const uint16_t ITConf, I2C * mi2cChannel )
@@ -337,6 +343,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_ConfigureGPO( const uint16_t ITConf, I2C * mi2cC
 /**
   * @brief  Reads the ST25DV ITtime duration for the GPO pulses.
   * @param  pITtime Pointer used to return the coefficient for the GPO Pulse duration (Pulse duration = 302,06 us - ITtime * 512 / fc).
+  * @param  mi2cChannel  I2C channel
   * @return NFCTAG_StatusTypeDef enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_ReadITPulse( ST25DV_PULSE_DURATION * const pITtime, I2C * mi2cChannel )
@@ -361,6 +368,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_ReadITPulse( ST25DV_PULSE_DURATION * const pITti
   * @brief    Configures the ST25DV ITtime duration for the GPO pulse.
   * @details  Needs the I2C Password presentation to be effective.
   * @param    ITtime Coefficient for the Pulse duration to be written (Pulse duration = 302,06 us - ITtime * 512 / fc)
+  * @param    mi2cChannel  I2C channel
   * @retval   NFCTAG_StatusTypeDef enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_WriteITPulse( const ST25DV_PULSE_DURATION ITtime, I2C * mi2cChannel )
@@ -379,6 +387,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_WriteITPulse( const ST25DV_PULSE_DURATION ITtime
   * @param  pData   Pointer used to return the read data.
   * @param  TarAddr I2C data memory address to read.
   * @param  NbByte  Number of bytes to be read.
+  * @param  mi2cChannel I2C channel
   * @return NFCTAG_StatusTypeDef enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_ReadData( uint8_t * const pData, const uint16_t TarAddr, const uint16_t NbByte, I2C * mi2cChannel)
@@ -392,6 +401,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_ReadData( uint8_t * const pData, const uint16_t 
   * @param  pData   Pointer on the data to be written.
   * @param  TarAddr I2C data memory address to be written.
   * @param  NbByte  Number of bytes to be written.
+  * @param mi2cChannel I2C channel
   * @return NFCTAG_StatusTypeDef enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_WriteData( const uint8_t * const pData, const uint16_t TarAddr, const uint16_t NbByte, I2C* mi2cChannel )
@@ -426,7 +436,6 @@ NFCTAG_StatusTypeDef ST25DV_i2c_WriteData( const uint8_t * const pData, const ui
     if( ret == 0 )
     {
       /* Poll until EEPROM is available */
-    //  clock_t tickstart = clock();
 
       int ms = 0;
       /* Wait until ST25DV is ready or timeout occurs */
@@ -459,6 +468,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_WriteData( const uint8_t * const pData, const ui
   * @brief  Reads N bytes of Data, starting at current address.
   * @param  pData   Pointer used to return the read data.
   * @param  NbByte  Number of bytes to be read.
+  * @param mi2cChannel : I2C channel
   * @return NFCTAG_StatusTypeDef enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_ReadDataCurrentAddr( uint8_t * const pData, const uint16_t NbByte, I2C* mi2cChannel )
@@ -472,6 +482,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_ReadDataCurrentAddr( uint8_t * const pData, cons
   * @param  pData   Pointer used to return the read data.
   * @param  TarAddr I2C memory address to be read.
   * @param  NbByte  Number of bytes to be read.
+  * @param  mi2cChannel I2C channel
   * @return NFCTAG_StatusTypeDef enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_ReadRegister( uint8_t * const pData, const uint16_t TarAddr, const uint16_t NbByte, I2C * mi2cChannel )
@@ -486,6 +497,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_ReadRegister( uint8_t * const pData, const uint1
   * @param    pData   Pointer on the data to be written.
   * @param    TarAddr I2C register address to written.
   * @param    NbByte  Number of bytes to be written.
+  * @param    mi2cChannel I2C channel
   * @return   NFCTAG_StatusTypeDef enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_WriteRegister( const uint8_t * const pData, const uint16_t TarAddr, const uint16_t NbByte, I2C * mi2cChannel )
@@ -550,6 +562,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_WriteRegister( const uint8_t * const pData, cons
 /**
   * @brief  Reads the ST25DV UID.
   * @param  pUid Pointer used to return the ST25DV UID value.
+  * @param  mi2cChannel I2C channel
   * @return NFCTAG_StatusTypeDef enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_ReadUID( ST25DV_UID * const pUid, I2C * mi2cChannel )
@@ -597,6 +610,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_ReadDSFID( uint8_t * const pDsfid, I2C * mi2cCha
 /**
   * @brief  Reads the ST25DV DSFID RF Lock state.
   * @param  pLockDsfid Pointer on a ST25DV_LOCK_STATUS used to return the DSFID lock state.
+  * @param  mi2cChannel I2C channel
   * @return NFCTAG_StatusTypeDef enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_ReadDsfidRFProtection( ST25DV_LOCK_STATUS * const pLockDsfid, I2C * mi2cChannel)
@@ -626,6 +640,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_ReadDsfidRFProtection( ST25DV_LOCK_STATUS * cons
 /**
   * @brief  Reads the ST25DV AFI.
   * @param  pAfi Pointer used to return the ST25DV AFI value.
+  * @param  mi2cChannel I2C channel
   * @return NFCTAG_StatusTypeDef enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_ReadAFI( uint8_t * const pAfi, I2C * mi2cChannel )
@@ -637,6 +652,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_ReadAFI( uint8_t * const pAfi, I2C * mi2cChannel
 /**
   * @brief  Reads the AFI RF Lock state.
   * @param  pLockAfi Pointer on a ST25DV_LOCK_STATUS used to return the ASFID lock state.
+  * @param  mi2cChannel I2C channel
   * @return NFCTAG_StatusTypeDef enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_ReadAfiRFProtection( ST25DV_LOCK_STATUS * const pLockAfi, I2C * mi2cChannel )
@@ -666,6 +682,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_ReadAfiRFProtection( ST25DV_LOCK_STATUS * const 
 /**
   * @brief  Reads the I2C Protected Area state.
   * @param  pProtZone Pointer on a ST25DV_I2C_PROT_ZONE structure used to return the Protected Area state.
+  * @param  mi2cChannel I2C channel
   * @return NFCTAG_StatusTypeDef enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_ReadI2CProtectZone( ST25DV_I2C_PROT_ZONE * const pProtZone, I2C * mi2cChannel )
@@ -694,6 +711,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_ReadI2CProtectZone( ST25DV_I2C_PROT_ZONE * const
   * @details  Needs the I2C Password presentation to be effective.
   * @param    Zone                ST25DV_PROTECTION_ZONE value coresponding to the area to protect.
   * @param    ReadWriteProtection ST25DV_PROTECTION_CONF value corresponding to the protection to be set.
+  * @param  mi2cChannel I2C channel
   * @return   NFCTAG_StatusTypeDef enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_WriteI2CProtectZonex( const ST25DV_PROTECTION_ZONE Zone, const ST25DV_PROTECTION_CONF ReadWriteProtection, I2C * mi2cChannel )
@@ -738,6 +756,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_WriteI2CProtectZonex( const ST25DV_PROTECTION_ZO
 /**
   * @brief  Reads the CCile protection state.
   * @param  pLockCCFile Pointer on a ST25DV_LOCK_CCFILE value corresponding to the lock state of the CCFile.
+  * @param  mi2cChannel I2C channel
   * @return NFCTAG_StatusTypeDef enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_ReadLockCCFile( ST25DV_LOCK_CCFILE * const pLockCCFile, I2C * mi2cChannel )
@@ -779,6 +798,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_ReadLockCCFile( ST25DV_LOCK_CCFILE * const pLock
   * @details  Needs the I2C Password presentation to be effective.
   * @param  NbBlockCCFile ST25DV_CCFILE_BLOCK value corresponding to the number of blocks to be locked.
   * @param  LockCCFile    ST25DV_LOCK_CCFILE value corresponding to the lock state to apply on the CCFile.
+  * @param  mi2cChannel I2C channel
   * @return NFCTAG_StatusTypeDef enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_WriteLockCCFile( const ST25DV_CCFILE_BLOCK NbBlockCCFile, const ST25DV_LOCK_STATUS LockCCFile, I2C * mi2cChannel )
@@ -816,6 +836,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_WriteLockCCFile( const ST25DV_CCFILE_BLOCK NbBlo
 /**
   * @brief  Reads the Cfg registers protection.
   * @param  pLockCfg Pointer on a ST25DV_LOCK_STATUS value corresponding to the Cfg registers lock state.
+  * @param  mi2cChannel I2C channel
   * @return NFCTAG_StatusTypeDef enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_ReadLockCFG( ST25DV_LOCK_STATUS * const pLockCfg, I2C * mi2cChannel )
@@ -846,6 +867,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_ReadLockCFG( ST25DV_LOCK_STATUS * const pLockCfg
   * @brief  Lock/Unlock the Cfg registers, to prevent any RF write access.
   * @details  Needs the I2C Password presentation to be effective.
   * @param  LockCfg ST25DV_LOCK_STATUS value corresponding to the lock state to be written.
+  * @param  mi2cChannel I2C channel
   * @return NFCTAG_StatusTypeDef enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_WriteLockCFG( const ST25DV_LOCK_STATUS LockCfg, I2C * mi2cChannel )
@@ -862,6 +884,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_WriteLockCFG( const ST25DV_LOCK_STATUS LockCfg, 
 /**
   * @brief  Presents I2C password, to authorize the I2C writes to protected areas.
   * @param  PassWord Password value on 32bits
+  * @param  mi2cChannel I2C channel
   * @return NFCTAG_StatusTypeDef enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_PresentI2CPassword( const ST25DV_PASSWD PassWord, I2C * mi2cChannel )
@@ -887,6 +910,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_PresentI2CPassword( const ST25DV_PASSWD PassWord
   * @brief  Writes a new I2C password.
   * @details  Needs the I2C Password presentation to be effective.
   * @param  PassWord New I2C PassWord value on 32bits.
+  * @param  mi2cChannel I2C channel
   * @return NFCTAG_StatusTypeDef enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_WriteI2CPassword( const ST25DV_PASSWD PassWord, I2C * mi2cChannel )
@@ -913,6 +937,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_WriteI2CPassword( const ST25DV_PASSWD PassWord, 
   * @brief  Reads the RF Zone Security Status (defining the allowed RF accesses).
   * @param  Zone        ST25DV_PROTECTION_ZONE value coresponding to the protected area.
   * @param  pRfprotZone Pointer on a ST25DV_RF_PROT_ZONE value corresponding to the area protection state.
+  * @param  mi2cChannel I2C channel
   * @return NFCTAG_StatusTypeDef enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_ReadRFZxSS( const ST25DV_PROTECTION_ZONE Zone, ST25DV_RF_PROT_ZONE * const pRfprotZone, I2C * mi2cChannel )
@@ -960,6 +985,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_ReadRFZxSS( const ST25DV_PROTECTION_ZONE Zone, S
   * @details  Needs the I2C Password presentation to be effective.
   * @param  Zone        ST25DV_PROTECTION_ZONE value corresponding to the area on which to set the RF protection.
   * @param  RfProtZone  Pointer on a ST25DV_RF_PROT_ZONE value defininf the protection to be set on the area.
+  * @param  mi2cChannel I2C channel
   * @return NFCTAG_StatusTypeDef enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_WriteRFZxSS( const ST25DV_PROTECTION_ZONE Zone, const ST25DV_RF_PROT_ZONE RfProtZone, I2C * mi2cChannel )
@@ -999,6 +1025,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_WriteRFZxSS( const ST25DV_PROTECTION_ZONE Zone, 
   * @brief  Reads the value of the an area end address.
   * @param  EndZone ST25DV_END_ZONE value corresponding to an area end address.
   * @param  pEndZ   Pointer used to return the end address of the area.
+  * @param  mi2cChannel I2C channel
   * @return NFCTAG_StatusTypeDef enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_ReadEndZonex( const ST25DV_END_ZONE EndZone, uint8_t * const pEndZ, I2C * mi2cChannel )
@@ -1033,6 +1060,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_ReadEndZonex( const ST25DV_END_ZONE EndZone, uin
   *           These NACKs are ok.
   * @param  EndZone ST25DV_END_ZONE value corresponding to an area.
   * @param  EndZ   End zone value to be written.
+  * @param  mi2cChannel I2C channel
   * @return NFCTAG_StatusTypeDef enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_WriteEndZonex( const ST25DV_END_ZONE EndZone, const uint8_t EndZ , I2C * mi2cChannel)
@@ -1068,6 +1096,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_WriteEndZonex( const ST25DV_END_ZONE EndZone, co
   * @details  Needs the I2C Password presentation to be effective..
   *           The ST25DV answers a NACK when setting the EndZone2 & EndZone3 to same value than repectively EndZone1 & EndZone2.
   *           These NACKs are ok.
+  * @param  mi2cChannel I2C channel
   * @return NFCTAG_StatusTypeDef enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_InitEndZone( I2C * mi2cChannel )
@@ -1116,6 +1145,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_InitEndZone( I2C * mi2cChannel )
   * @param  Zone2Length Length of area2 in bytes (0 to 8128, 0x00 to 0x1FC0)
   * @param  Zone3Length Length of area3 in bytes (0 to 8064, 0x00 to 0x1F80)
   * @param  Zone4Length Length of area4 in bytes (0 to 8000, 0x00 to 0x1F40)
+  * @param  mi2cChannel I2C channel
   * @return NFCTAG_StatusTypeDef enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_CreateUserZone( uint16_t Zone1Length, uint16_t Zone2Length, uint16_t Zone3Length, uint16_t Zone4Length, I2C * mi2cChannel )
@@ -1196,6 +1226,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_CreateUserZone( uint16_t Zone1Length, uint16_t Z
 /**
   * @brief  Reads the ST25DV Memory Size.
   * @param  pSizeInfo Pointer on a ST25DV_MEM_SIZE structure used to return the Memory size information.
+  * @param  mi2cChannel I2C channel
   * @return NFCTAG_StatusTypeDef enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_ReadMemSize( ST25DV_MEM_SIZE * const pSizeInfo, I2C * mi2cChannel )
@@ -1222,6 +1253,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_ReadMemSize( ST25DV_MEM_SIZE * const pSizeInfo, 
 /**
   * @brief  Reads the Energy harvesting mode.
   * @param  pEH_mode Pointer on a ST25DV_EH_MODE_STATUS value corresponding to the Energy Harvesting state.
+  * @param  mi2cChannel I2C channel
   * @return NFCTAG_StatusTypeDef enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_ReadEHMode( ST25DV_EH_MODE_STATUS * const pEH_mode, I2C * mi2cChannel )
@@ -1251,6 +1283,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_ReadEHMode( ST25DV_EH_MODE_STATUS * const pEH_mo
   * @brief  Sets the Energy harvesting mode.
   * @details  Needs the I2C Password presentation to be effective.
   * @param  EH_mode ST25DV_EH_MODE_STATUS value for the Energy harvesting mode to be set.
+  * @param  mi2cChannel I2C channel
   * @return NFCTAG_StatusTypeDef enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_WriteEHMode( const ST25DV_EH_MODE_STATUS EH_mode, I2C * mi2cChannel )
@@ -1267,6 +1300,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_WriteEHMode( const ST25DV_EH_MODE_STATUS EH_mode
 /**
   * @brief  Reads the RF Management configuration.
   * @param  pRF_Mngt Pointer on a ST25DV_RF_MNGT structure used to return the RF Management configuration.
+  * @param  mi2cChannel I2C channel
   * @return NFCTAG_StatusTypeDef enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_ReadRFMngt( ST25DV_RF_MNGT * const pRF_Mngt, I2C * mi2cChannel )
@@ -1307,6 +1341,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_ReadRFMngt( ST25DV_RF_MNGT * const pRF_Mngt, I2C
   * @brief  Sets the RF Management configuration.
   * @details  Needs the I2C Password presentation to be effective.
   * @param  Rfmngt Value of the RF Management configuration to be written.
+  * @param  mi2cChannel I2C channel
   * @return NFCTAG_StatusTypeDef enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_WriteRFMngt( const uint8_t Rfmngt, I2C * mi2cChannel )
@@ -1318,6 +1353,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_WriteRFMngt( const uint8_t Rfmngt, I2C * mi2cCha
 /**
   * @brief  Reads the RFDisable register information.
   * @param  pRFDisable Pointer on a ST25DV_EN_STATUS value corresponding to the RF Disable status.
+  * @param  mi2cChannel I2C channel
   * @return NFCTAG_StatusTypeDef enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_GetRFDisable( ST25DV_EN_STATUS * const pRFDisable, I2C * mi2cChannel )
@@ -1347,7 +1383,8 @@ NFCTAG_StatusTypeDef ST25DV_i2c_GetRFDisable( ST25DV_EN_STATUS * const pRFDisabl
 
 /**
   * @brief  Sets the RF Disable configuration.
-  * @details  Needs the I2C Password presentation to be effective.
+  * @details  Needs the I2C Password presentation to be effective.7
+  * @param  mi2cChannel I2C channel
   * @return NFCTAG_StatusTypeDef enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_SetRFDisable( I2C * mi2cChannel )
@@ -1372,6 +1409,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_SetRFDisable( I2C * mi2cChannel )
 /**
   * @brief  Resets the RF Disable configuration
   * @details  Needs the I2C Password presentation to be effective.
+  * @param  mi2cChannel I2C channel
   * @return NFCTAG_StatusTypeDef enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_ResetRFDisable( I2C * mi2cChannel )
@@ -1396,6 +1434,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_ResetRFDisable( I2C * mi2cChannel )
 /**
   * @brief  Reads the RFSleep register information.
   * @param  pRFSleep Pointer on a ST25DV_EN_STATUS value corresponding to the RF Sleep status.
+  * @param  mi2cChannel I2C channel
   * @return NFCTAG_StatusTypeDef enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_GetRFSleep( ST25DV_EN_STATUS * const pRFSleep, I2C * mi2cChannel )
@@ -1426,6 +1465,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_GetRFSleep( ST25DV_EN_STATUS * const pRFSleep, I
 /**
   * @brief  Sets the RF Sleep configuration.
   * @details  Needs the I2C Password presentation to be effective.
+  * @param  mi2cChannel I2C channel
   * @return NFCTAG_StatusTypeDef enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_SetRFSleep( I2C * mi2cChannel )
@@ -1450,6 +1490,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_SetRFSleep( I2C * mi2cChannel )
 /**
   * @brief  Resets the RF Sleep configuration.
   * @details  Needs the I2C Password presentation to be effective.
+  * @param  mi2cChannel I2C channel
   * @return NFCTAG_StatusTypeDef enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_ResetRFSleep( I2C * mi2cChannel )
@@ -1474,6 +1515,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_ResetRFSleep( I2C * mi2cChannel )
 /**
   * @brief  Reads the Mailbox mode.
   * @param  pMB_mode Pointer on a ST25DV_EH_MODE_STATUS value used to return the Mailbox mode.
+  * @param  mi2cChannel I2C channel
   * @return NFCTAG_StatusTypeDef enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_ReadMBMode( ST25DV_EN_STATUS * const pMB_mode, I2C * mi2cChannel )
@@ -1505,6 +1547,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_ReadMBMode( ST25DV_EN_STATUS * const pMB_mode, I
   * @brief  Sets the Mailbox mode.
   * @details  Needs the I2C Password presentation to be effective.
   * @param  MB_mode ST25DV_EN_STATUS value corresponding to the Mailbox mode to be set.
+  * @param  mi2cChannel I2C channel
   * @return NFCTAG_StatusTypeDef enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_WriteMBMode( const ST25DV_EN_STATUS MB_mode, I2C * mi2cChannel )
@@ -1521,6 +1564,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_WriteMBMode( const ST25DV_EN_STATUS MB_mode, I2C
 /**
   * @brief  Reads the Mailbox watchdog duration coefficient.
   * @param  pWdgDelay Pointer on a uint8_t used to return the watchdog duration coefficient.
+  * @param  mi2cChannel I2C channel
   * @return NFCTAG_StatusTypeDef enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_ReadMBWDG( uint8_t * const pWdgDelay, I2C * mi2cChannel )
@@ -1545,6 +1589,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_ReadMBWDG( uint8_t * const pWdgDelay, I2C * mi2c
   * @brief  Writes the Mailbox watchdog coefficient delay
   * @details  Needs the I2C Password presentation to be effective.
   * @param  WdgDelay Watchdog duration coefficient to be written (Watch dog duration = MB_WDG*30 ms +/- 6%).
+  * @param  mi2cChannel I2C channel
   * @return NFCTAG_StatusTypeDef enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_WriteMBWDG( const uint8_t WdgDelay, I2C * mi2cChannel )
@@ -1563,6 +1608,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_WriteMBWDG( const uint8_t WdgDelay, I2C * mi2cCh
   * @param  pData   Pointer on the buffer used to return the read data.
   * @param  Offset  Offset in the Mailbox memory, byte number to start the read.
   * @param  NbByte  Number of bytes to be read.
+  * @param  mi2cChannel I2C channel
   * @return NFCTAG_StatusTypeDef enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_ReadMailboxData( uint8_t * const pData, const uint16_t Offset, const uint16_t NbByte, I2C * mi2cChannel )
@@ -1580,6 +1626,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_ReadMailboxData( uint8_t * const pData, const ui
   * @brief  Writes N bytes of data in the Mailbox, starting from first Mailbox Address.
   * @param  pData   Pointer to the buffer containing the data to be written.
   * @param  NbByte  Number of bytes to be written.
+  * @param  mi2cChannel I2C channel
   * @return NFCTAG_StatusTypeDef enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_WriteMailboxData( const uint8_t * const pData, const uint16_t NbByte, I2C * mi2cChannel )
@@ -1605,6 +1652,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_WriteMailboxData( const uint8_t * const pData, c
   * @param  pData   Pointer on the buffer used to return the data.
   * @param  TarAddr I2C memory address to be read.
   * @param  NbByte  Number of bytes to be read.
+  * @param  mi2cChannel I2C channel
   * @return NFCTAG_StatusTypeDef enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_ReadMailboxRegister( uint8_t * const pData, const uint16_t TarAddr, const uint16_t NbByte, I2C * mi2cChannel )
@@ -1622,6 +1670,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_ReadMailboxRegister( uint8_t * const pData, cons
   * @param  pData   Pointer on the data to be written.
   * @param  TarAddr I2C register address to be written.
   * @param  NbByte  Number of bytes to be written.
+  * @param  mi2cChannel I2C channel
   * @return NFCTAG_StatusTypeDef enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_WriteMailboxRegister( const uint8_t * const pData, const uint16_t TarAddr, const uint16_t NbByte, I2C * mi2cChannel )
@@ -1638,7 +1687,6 @@ NFCTAG_StatusTypeDef ST25DV_i2c_WriteMailboxRegister( const uint8_t * const pDat
   {
     /* Write NbByte data in memory */
     status = ST25DV_IO_MemWrite( pData, ST25DV_ADDR_DATA_I2C, TarAddr, NbByte, mi2cChannel);
-	//  status = ST25DV_IO_MemRead( pData, ST25DV_ADDR_DATA_I2C, TarAddr, NbByte,  mi2cChannel );
   }
   else
   {
@@ -1651,6 +1699,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_WriteMailboxRegister( const uint8_t * const pDat
 /**
   * @brief  Reads the status of the security session open register.
   * @param  pSession Pointer on a ST25DV_I2CSSO_STATUS value used to return the session status.
+  * @param  mi2cChannel I2C channel
   * @return NFCTAG_StatusTypeDef enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_ReadI2CSecuritySession_Dyn( ST25DV_I2CSSO_STATUS * const pSession, I2C * mi2cChannel )
@@ -1689,7 +1738,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_ReadI2CSecuritySession_Dyn( ST25DV_I2CSSO_STATUS
   *                       - RFPUTMSG = 0x20
   *                       - RFGETMSG = 0x40
   *                       - RFWRITE = 0x80
-  *
+  * @param  mi2cChannel I2C channel
   * @return NFCTAG_StatusTypeDef enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_ReadITSTStatus_Dyn( uint8_t * const pITStatus, I2C * mi2cChannel )
@@ -1701,6 +1750,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_ReadITSTStatus_Dyn( uint8_t * const pITStatus, I
 /**
   * @brief  Read value of dynamic GPO register configuration.
   * @param  pGPO ST25DV_GPO pointer of the dynamic GPO configuration to store.
+  * @param  mi2cChannel I2C channel
   * @retval NFCTAG enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_ReadGPO_Dyn( uint8_t *GPOConfig, I2C * mi2cChannel )
@@ -1713,6 +1763,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_ReadGPO_Dyn( uint8_t *GPOConfig, I2C * mi2cChann
 /**
   * @brief  Get dynamique GPO enable status
   * @param  pGPO_en ST25DV_EN_STATUS pointer of the GPO enable status to store
+  * @param  mi2cChannel I2C channel
   * @retval NFCTAG enum status
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_GetGPO_en_Dyn( ST25DV_EN_STATUS * const pGPO_en, I2C * mi2cChannel )
@@ -1742,6 +1793,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_GetGPO_en_Dyn( ST25DV_EN_STATUS * const pGPO_en,
 /**
   * @brief  Set dynamique GPO enable configuration.
   * @param  None No parameters.
+  * @param  mi2cChannel I2C channel
   * @retval NFCTAG enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_SetGPO_en_Dyn( I2C * mi2cChannel )
@@ -1766,6 +1818,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_SetGPO_en_Dyn( I2C * mi2cChannel )
 /**
   * @brief  Reset dynamique GPO enable configuration.
   * @param  None No parameters.
+  * @param  mi2cChannel I2C channel
   * @retval NFCTAG enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_ResetGPO_en_Dyn( I2C * mi2cChannel )
@@ -1790,6 +1843,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_ResetGPO_en_Dyn( I2C * mi2cChannel )
 /**
   * @brief  Read value of dynamic EH Ctrl register configuration
   * @param  pEH_CTRL : ST25DV_EH_CTRL pointer of the dynamic EH Ctrl configuration to store
+  * @param  mi2cChannel I2C channel
   * @retval NFCTAG enum status
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_ReadEHCtrl_Dyn( ST25DV_EH_CTRL * const pEH_CTRL, I2C * mi2cChannel )
@@ -1851,6 +1905,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_ReadEHCtrl_Dyn( ST25DV_EH_CTRL * const pEH_CTRL,
 /**
   * @brief  Reads the Energy Harvesting dynamic status.
   * @param  pEH_Val Pointer on a ST25DV_EN_STATUS value used to return the Energy Harvesting dynamic status.
+  * @param  mi2cChannel I2C channel
   * @return NFCTAG_StatusTypeDef enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_GetEHENMode_Dyn( ST25DV_EN_STATUS * const pEH_Val, I2C * mi2cChannel )
@@ -1880,6 +1935,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_GetEHENMode_Dyn( ST25DV_EN_STATUS * const pEH_Va
 
 /**
   * @brief  Dynamically sets the Energy Harvesting mode.
+  * @param  mi2cChannel I2C channel
   * @return NFCTAG_StatusTypeDef enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_SetEHENMode_Dyn(  I2C * mi2cChannel )
@@ -1903,6 +1959,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_SetEHENMode_Dyn(  I2C * mi2cChannel )
 
 /**
   * @brief  Dynamically unsets the Energy Harvesting mode.
+  * @param  mi2cChannel I2C channel
   * @return NFCTAG_StatusTypeDef enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_ResetEHENMode_Dyn( I2C * mi2cChannel )
@@ -1927,6 +1984,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_ResetEHENMode_Dyn( I2C * mi2cChannel )
 /**
   * @brief  Reads the EH_ON status from the EH_CTRL_DYN register.
   * @param  pEHON Pointer on a ST25DV_EN_STATUS value used to return the EHON status.
+  * @param  mi2cChannel I2C channel
   * @return NFCTAG_StatusTypeDef enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_GetEHON_Dyn( ST25DV_EN_STATUS * const pEHON, I2C * mi2cChannel )
@@ -1957,6 +2015,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_GetEHON_Dyn( ST25DV_EN_STATUS * const pEHON, I2C
 /**
   * @brief  Checks if RF Field is present in front of the ST25DV.
   * @param  pRF_Field Pointer on a ST25DV_FIELD_STATUS value used to return the field presence.
+  * @param  mi2cChannel I2C channel
   * @return NFCTAG_StatusTypeDef enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_GetRFField_Dyn( ST25DV_FIELD_STATUS * const pRF_Field, I2C * mi2cChannel )
@@ -1987,6 +2046,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_GetRFField_Dyn( ST25DV_FIELD_STATUS * const pRF_
 /**
   * @brief  Check if VCC is supplying the ST25DV.
   * @param  pVCC ST25DV_VCC_STATUS pointer of the VCC status to store
+  * @param  mi2cChannel I2C channel
   * @retval NFCTAG enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_GetVCC_Dyn( ST25DV_VCC_STATUS * const pVCC, I2C * mi2cChannel )
@@ -2017,6 +2077,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_GetVCC_Dyn( ST25DV_VCC_STATUS * const pVCC, I2C 
 /**
   * @brief  Read value of dynamic RF Management configuration
   * @param  pRF_Mngt : ST25DV_RF_MNGT pointer of the dynamic RF Management configuration to store
+  * @param  mi2cChannel I2C channel
   * @retval NFCTAG enum status
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_ReadRFMngt_Dyn( ST25DV_RF_MNGT * const pRF_Mngt, I2C * mi2cChannel )
@@ -2058,6 +2119,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_ReadRFMngt_Dyn( ST25DV_RF_MNGT * const pRF_Mngt,
 /**
   * @brief  Writes a value to the RF Management dynamic register.
   * @param  RF_Mngt Value to be written to the RF Management dynamic register.
+  * @param  mi2cChannel I2C channel
   * @return NFCTAG_StatusTypeDef enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_WriteRFMngt_Dyn( const uint8_t RF_Mngt, I2C * mi2cChannel )
@@ -2069,6 +2131,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_WriteRFMngt_Dyn( const uint8_t RF_Mngt, I2C * mi
 /**
   * @brief  Reads the RFDisable dynamic register information.
   * @param  pRFDisable Pointer on a ST25DV_EN_STATUS value used to return the RF Disable state.
+  * @param  mi2cChannel I2C channel
   * @return NFCTAG_StatusTypeDef enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_GetRFDisable_Dyn( ST25DV_EN_STATUS * const pRFDisable, I2C * mi2cChannel )
@@ -2098,6 +2161,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_GetRFDisable_Dyn( ST25DV_EN_STATUS * const pRFDi
 
 /**
   * @brief  Sets the RF Disable dynamic configuration.
+  * @param  mi2cChannel I2C channel
   * @return NFCTAG_StatusTypeDef enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_SetRFDisable_Dyn( I2C * mi2cChannel )
@@ -2121,6 +2185,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_SetRFDisable_Dyn( I2C * mi2cChannel )
 
 /**
   * @brief  Unsets the RF Disable dynamic configuration.
+  * @param  mi2cChannel I2C channel
   * @return NFCTAG_StatusTypeDef enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_ResetRFDisable_Dyn( I2C * mi2cChannel )
@@ -2145,6 +2210,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_ResetRFDisable_Dyn( I2C * mi2cChannel )
 /**
   * @brief  Reads the RFSleep dynamic register information.
   * @param  pRFSleep Pointer on a ST25DV_EN_STATUS values used to return the RF Sleep state.
+  * @param  mi2cChannel I2C channel
   * @return NFCTAG_StatusTypeDef enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_GetRFSleep_Dyn( ST25DV_EN_STATUS * const pRFSleep, I2C * mi2cChannel )
@@ -2174,6 +2240,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_GetRFSleep_Dyn( ST25DV_EN_STATUS * const pRFSlee
 
 /**
   * @brief  Sets the RF Sleep dynamic configuration.
+  * @param  mi2cChannel I2C channel
   * @return NFCTAG_StatusTypeDef enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_SetRFSleep_Dyn( I2C * mi2cChannel )
@@ -2197,6 +2264,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_SetRFSleep_Dyn( I2C * mi2cChannel )
 
 /**
   * @brief  Unsets the RF Sleep dynamic configuration.
+  * @param  mi2cChannel I2C channel
   * @return NFCTAG_StatusTypeDef enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_ResetRFSleep_Dyn( I2C * mi2cChannel )
@@ -2221,6 +2289,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_ResetRFSleep_Dyn( I2C * mi2cChannel )
 /**
   * @brief  Reads the Mailbox ctrl dynamic register.
   * @param  pCtrlStatus Pointer on a ST25DV_MB_CTRL_DYN_STATUS structure used to return the dynamic Mailbox ctrl information.
+  * @param  mi2cChannel I2C channel
   * @return NFCTAG_StatusTypeDef enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_ReadMBCtrl_Dyn( ST25DV_MB_CTRL_DYN_STATUS * const pCtrlStatus, I2C * mi2cChannel )
@@ -2248,6 +2317,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_ReadMBCtrl_Dyn( ST25DV_MB_CTRL_DYN_STATUS * cons
 
 /**
   * @brief  Reads the Mailbox Enable dynamic configuration.
+  * @param  mi2cChannel I2C channel
   * @return NFCTAG_StatusTypeDef enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_GetMBEN_Dyn( ST25DV_EN_STATUS * const pMBEN, I2C * mi2cChannel )
@@ -2276,6 +2346,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_GetMBEN_Dyn( ST25DV_EN_STATUS * const pMBEN, I2C
 
 /**
   * @brief  Sets the Mailbox Enable dynamic configuration.
+  * @param  mi2cChannel I2C channel
   * @return NFCTAG_StatusTypeDef enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_SetMBEN_Dyn( I2C * mi2cChannel )
@@ -2291,6 +2362,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_SetMBEN_Dyn( I2C * mi2cChannel )
 
 /**
   * @brief  Unsets the Mailbox Enable dynamic configuration.
+  * @param  mi2cChannel I2C channel
   * @return NFCTAG_StatusTypeDef enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_ResetMBEN_Dyn( I2C * mi2cChannel )
@@ -2310,6 +2382,7 @@ NFCTAG_StatusTypeDef ST25DV_i2c_ResetMBEN_Dyn( I2C * mi2cChannel )
 /**
   * @brief  Reads the Mailbox message length dynamic register.
   * @param  pMBLength Pointer on a uint8_t used to return the Mailbox message length.
+  * @param  mi2cChannel I2C channel
   * @return NFCTAG_StatusTypeDef enum status.
   */
 NFCTAG_StatusTypeDef ST25DV_i2c_ReadMBLength_Dyn( uint8_t * const pMBLength, I2C * mi2cChannel )
